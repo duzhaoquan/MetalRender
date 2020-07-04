@@ -16,19 +16,45 @@ struct Color {
     var alpha :Double = 0
     
 }
+struct VertexColor {
+    var vex:vector_float2
+    var color:vector_float4
+}
+
 class DzqRender: NSObject {
     var view : MTKView
     var commandQueue : MTLCommandQueue
     var device :MTLDevice
-    
-    
+    var pipelineState:MTLRenderPipelineState?
+    var viewSize :CGSize = CGSize.zero
     init(view:MTKView) {
         self.view = view
         self.device = view.device!
         self.commandQueue = device.makeCommandQueue()!
         super.init()
-        
         view.preferredFramesPerSecond = 60
+        viewSize = view.drawableSize
+        var library = device.makeDefaultLibrary()
+//
+        if let url = Bundle.main.url(forResource: "", withExtension: ""){
+            library = try? device.makeLibrary(URL: url)
+        }
+        
+        let vfunc:MTLFunction? = library?.makeFunction(name: "vertexShader")
+        let fFunc:MTLFunction? = library?.makeFunction(name: "fragmentShader")
+        
+        let description = MTLRenderPipelineDescriptor()
+        description.vertexFunction = vfunc
+        description.fragmentFunction = fFunc
+        description.colorAttachments[0].pixelFormat = view.colorPixelFormat
+        
+        do {
+            pipelineState = try device.makeRenderPipelineState(descriptor: description)
+        } catch let error {
+            print(error.localizedDescription)
+        }
+        
+        
     }
     //1. 增加颜色/减小颜色的 标记
      var growing = true;
@@ -92,19 +118,48 @@ class DzqRender: NSObject {
 extension DzqRender : MTKViewDelegate{
     // 当MTKView视图发生大小改变时调用
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        
+        viewSize = size
         
     }
     //每当视图需要渲染时调用
     func draw(in view: MTKView) {
-        let color = makeFancyColor()
-        view.clearColor = MTLClearColorMake(color.red, color.green, color.blue, color.alpha)
+//        let color = makeFancyColor()
+//        view.clearColor = MTLClearColorMake(color.red, color.green, color.blue, color.alpha)
         //为当前渲染的每个渲染传递创建一个新的命令缓冲区
         let commandBuffer = commandQueue.makeCommandBuffer()
         commandBuffer?.label = "buffer"
+        
+        
         //5.判断renderPassDescriptor 渲染描述符是否创建成功,否则则跳过任何渲染.
-        if let passDescriptor = view.currentRenderPassDescriptor {
+        if let passDescriptor = view.currentRenderPassDescriptor, let state = pipelineState {
             let renderEncoder = commandBuffer?.makeRenderCommandEncoder(descriptor: passDescriptor)
+            
+            let viewpoint:MTLViewport = MTLViewport(originX: 0, originY: 0, width: Double(viewSize.width), height: Double(viewSize.height), znear: -1, zfar: 1)
+            renderEncoder?.setViewport(viewpoint)
+            
+            renderEncoder?.setRenderPipelineState(state)
+            /*
+             在 Metal 中是归一化的坐标系，以屏幕中心为原点(0, 0, 0)，且是始终不变的。面对屏幕，你的右边是x正轴，上面是y正轴，屏幕指向你的为z正轴。长度单位这样来定：窗口范围按此单位恰好是(-1,-1)到(1,1)，即屏幕左下角坐标为（-1，-1），右上角坐标为（1,1）
+
+             */
+//            let vertex:[Float] = [
+//                -1.0, 0.0, 1, 0, 0, 1,
+//                2.0,  1.0, 0, 1, 0, 1,
+//                1.0, 0.5,  0, 0, 1, 1
+//            ]
+            
+            let vertex :[VertexColor] = [
+                VertexColor(vex: vector_float2(-1, 0), color: vector_float4(1, 0, 0, 1)),
+                VertexColor(vex: vector_float2(1, 0), color: vector_float4(0, 1, 0, 1)),
+                VertexColor(vex: vector_float2(0, 0.5), color: vector_float4(0, 0, 1, 1)),
+            ]
+            renderEncoder?.setVertexBytes(vertex, length: MemoryLayout<VertexColor>.size * 3, index: 0)
+            
+            
+            //renderEncoder?.setVertexBytes(&Vpoint, length: MemoryLayout<Float>.size * 2, index: 1)
+            
+            renderEncoder?.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+            
             //7.我们可以使用MTLRenderCommandEncoder 来绘制对象,但是这个demo我们仅仅创建编码器就可以了,我们并没有让Metal去执行我们绘制的东西,这个时候表示我们的任务已经完成.
             //即可结束MTLRenderCommandEncoder 工作
             renderEncoder?.endEncoding()

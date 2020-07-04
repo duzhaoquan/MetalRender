@@ -14,6 +14,16 @@
 		6011B7D124A836AC0089282D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6011B7D024A836AC0089282D /* Assets.xcassets */; };
 		6011B7D424A836AC0089282D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6011B7D224A836AC0089282D /* LaunchScreen.storyboard */; };
 		6011B7DC24A83A2D0089282D /* DzqRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6011B7DB24A83A2D0089282D /* DzqRender.swift */; };
+		6024ED9624AC1D7B00A62DAE /* DQRender.metal in Sources */ = {isa = PBXBuildFile; fileRef = 6024ED9524AC1D7B00A62DAE /* DQRender.metal */; };
+		6024ED9B24AC745400A62DAE /* TextureRender.metal in Sources */ = {isa = PBXBuildFile; fileRef = 6024ED9A24AC745400A62DAE /* TextureRender.metal */; };
+		6024ED9D24AC755900A62DAE /* ImageRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6024ED9C24AC755900A62DAE /* ImageRender.swift */; };
+		6046372724AD710700448CDE /* hulu.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 6046372624AD710600448CDE /* hulu.jpg */; };
+		6046372B24ADA60200448CDE /* Image.tga in Resources */ = {isa = PBXBuildFile; fileRef = 6046372A24ADA60200448CDE /* Image.tga */; };
+		6046373D24ADB33400448CDE /* CubeRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6046373C24ADB33400448CDE /* CubeRender.swift */; };
+		6046373F24ADC86F00448CDE /* CubeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6046373E24ADC86F00448CDE /* CubeViewController.swift */; };
+		6046374224ADCBB800448CDE /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6046374124ADCBB800448CDE /* ImageViewController.swift */; };
+		6046374424ADCC3E00448CDE /* RenderColorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6046374324ADCC3E00448CDE /* RenderColorViewController.swift */; };
+		6046374624ADCF9F00448CDE /* CubeRender.metal in Sources */ = {isa = PBXBuildFile; fileRef = 6046374524ADCF9F00448CDE /* CubeRender.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +36,16 @@
 		6011B7D324A836AC0089282D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6011B7D524A836AC0089282D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6011B7DB24A83A2D0089282D /* DzqRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DzqRender.swift; sourceTree = "<group>"; };
+		6024ED9524AC1D7B00A62DAE /* DQRender.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = DQRender.metal; sourceTree = "<group>"; };
+		6024ED9A24AC745400A62DAE /* TextureRender.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = TextureRender.metal; sourceTree = "<group>"; };
+		6024ED9C24AC755900A62DAE /* ImageRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageRender.swift; sourceTree = "<group>"; };
+		6046372624AD710600448CDE /* hulu.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = hulu.jpg; sourceTree = "<group>"; };
+		6046372A24ADA60200448CDE /* Image.tga */ = {isa = PBXFileReference; lastKnownFileType = file; path = Image.tga; sourceTree = "<group>"; };
+		6046373C24ADB33400448CDE /* CubeRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeRender.swift; sourceTree = "<group>"; };
+		6046373E24ADC86F00448CDE /* CubeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeViewController.swift; sourceTree = "<group>"; };
+		6046374124ADCBB800448CDE /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
+		6046374324ADCC3E00448CDE /* RenderColorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderColorViewController.swift; sourceTree = "<group>"; };
+		6046374524ADCF9F00448CDE /* CubeRender.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = CubeRender.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,10 +78,20 @@
 		6011B7C624A836A80089282D /* MetalTest */ = {
 			isa = PBXGroup;
 			children = (
+				6046372624AD710600448CDE /* hulu.jpg */,
+				6046372A24ADA60200448CDE /* Image.tga */,
 				6011B7C724A836A80089282D /* AppDelegate.swift */,
 				6011B7C924A836A80089282D /* SceneDelegate.swift */,
 				6011B7CB24A836A80089282D /* ViewController.swift */,
+				6024ED9524AC1D7B00A62DAE /* DQRender.metal */,
 				6011B7DB24A83A2D0089282D /* DzqRender.swift */,
+				6024ED9A24AC745400A62DAE /* TextureRender.metal */,
+				6024ED9C24AC755900A62DAE /* ImageRender.swift */,
+				6046374524ADCF9F00448CDE /* CubeRender.metal */,
+				6046373C24ADB33400448CDE /* CubeRender.swift */,
+				6046373E24ADC86F00448CDE /* CubeViewController.swift */,
+				6046374124ADCBB800448CDE /* ImageViewController.swift */,
+				6046374324ADCC3E00448CDE /* RenderColorViewController.swift */,
 				6011B7CD24A836A80089282D /* Main.storyboard */,
 				6011B7D024A836AC0089282D /* Assets.xcassets */,
 				6011B7D224A836AC0089282D /* LaunchScreen.storyboard */,
@@ -129,8 +159,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				6011B7D424A836AC0089282D /* LaunchScreen.storyboard in Resources */,
+				6046372724AD710700448CDE /* hulu.jpg in Resources */,
 				6011B7D124A836AC0089282D /* Assets.xcassets in Resources */,
 				6011B7CF24A836A80089282D /* Main.storyboard in Resources */,
+				6046372B24ADA60200448CDE /* Image.tga in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,8 +175,16 @@
 			files = (
 				6011B7CC24A836A80089282D /* ViewController.swift in Sources */,
 				6011B7DC24A83A2D0089282D /* DzqRender.swift in Sources */,
+				6046374224ADCBB800448CDE /* ImageViewController.swift in Sources */,
+				6046373D24ADB33400448CDE /* CubeRender.swift in Sources */,
+				6046374424ADCC3E00448CDE /* RenderColorViewController.swift in Sources */,
 				6011B7C824A836A80089282D /* AppDelegate.swift in Sources */,
 				6011B7CA24A836A80089282D /* SceneDelegate.swift in Sources */,
+				6024ED9624AC1D7B00A62DAE /* DQRender.metal in Sources */,
+				6046374624ADCF9F00448CDE /* CubeRender.metal in Sources */,
+				6024ED9B24AC745400A62DAE /* TextureRender.metal in Sources */,
+				6024ED9D24AC755900A62DAE /* ImageRender.swift in Sources */,
+				6046373F24ADC86F00448CDE /* CubeViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
