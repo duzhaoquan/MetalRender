@@ -10,7 +10,7 @@ import UIKit
 import MetalKit
 import GLKit
 struct CubeVertexTexture {
-    var vex:vector_float3
+    var vex:vector_float4
     var tex:vector_float2
 }
 class CubeRender: NSObject {
@@ -80,52 +80,74 @@ class CubeRender: NSObject {
     }
     func setUpVertex() {
         
-        let vertexs:[Float] = [
-            -0.5, 0.5, 0,  0, 1,
-             0.5, 0.5, 0,  1, 1,
-            -0.5,-0.5, 0,  0, 0,
-             0.5,-0.5, 0,  1, 0
-//             0,    0,  1,0.5,0.5
+//        let vertexs:[Float] = [
+//            1,-1,6,
+//            -1,-1,6,
+//            -1,1,6,
+//            1,1,6
+//
+////             0,   0,    0.3,  0.5,0.5,  0,1,1,1,
+//        ]
+        /*
+         -1,0
+         0,1
+         1,-1
+         
+         -1,1
+         0,1
+         1,-1
+         
+         -1,1
+         1,1
+         1,-1
+         
+         -1,1
+         1,1
+         1,-1
+         
+         0.0,1,
+         0.0,1,
+         0.0,1,
+         0.0,1,
+         
+         -0.3, 0, 1, 0,0,0,1,
+         -0.3, 1, 1, 0,1,1,0,
+         -0.3, 0, 0, 0,1,1,1,
+         -0.3, 1, 0, 1,1,0,1,
+         */
+        let vertexs1:[Float] = [
+          
+            -0.5, 0.5, 0, 1.0,0, 1,
+             0.5, 0.5, 0, 1.0,1, 1,
+            -0.5,-0.5, 0, 1.0,0, 0,
+             0.5,-0.5, 0, 1.0,1, 0,
+            0.0, 0.0, 0.5, 1,0.5,0.5
             
         ]
-        /*
-         0.0,1,
-         0.0,1,
-         0.0,1,
-         0.0,1,
-         */
-        var vertexs1:[Float] = [
-            1,-1,  0.0,  1,0,
-            -1,-1, 0.0,  0,0,
-            -1,1,  0.0,  0,1,
-            -1,1,  0.0,  0,1,
-            1,-1,  0.0,  1,0,
-            1,1,   0.0,  1,1
+        var  vertexs2 : [CubeVertexTexture] = [
+            CubeVertexTexture(vex: vector_float4(-0.5, 0.5, 0, 1.0), tex: vector_float2(0, 1)),//左上
+            CubeVertexTexture(vex: vector_float4( 0.5, 0.5, 0, 1.0), tex: vector_float2(1, 1)),//右上
+            CubeVertexTexture(vex: vector_float4(-0.5,-0.5, 0, 1.0), tex: vector_float2(0, 0)),//左下
+            CubeVertexTexture(vex: vector_float4( 0.5,-0.5, 0, 1.0), tex: vector_float2(1, 0)),//右下
+            CubeVertexTexture(vex: vector_float4( 0.0, 0.0, 0.5, 1.0), tex: vector_float2(0.5, 0.5))
         ]
-        let  vertexs2 : [CubeVertexTexture] = [
-        CubeVertexTexture(vex: vector_float3(1, -1,0), tex: vector_float2(1, 0)),
-        CubeVertexTexture(vex: vector_float3(-1,-1,0), tex: vector_float2(0, 0)),
-        CubeVertexTexture(vex: vector_float3(-1,1,0), tex: vector_float2(0, 1)),
-        CubeVertexTexture(vex: vector_float3(1,1,0), tex: vector_float2(1, 1)),
-        ]
-        vertexBuffer = device.makeBuffer(bytes: vertexs1, length: MemoryLayout<Float>.size * vertexs1.count, options: MTLResourceOptions.storageModeShared)
         
+        var vert: UnsafeRawPointer = UnsafeRawPointer(vertexs1)
+        vertexBuffer = device.makeBuffer(bytes: vert, length: MemoryLayout<CubeVertexTexture>.size * (vertexs2.count), options: .storageModeShared)
         
         //索引
-        let index:[Int32] = [
-//            0, 3, 2,
-//            0, 1, 3,
-            0,1,2,
-            0,2,3,
-            
-            
-//            0, 2, 4,
-//            0, 4, 1,
-//            2, 3, 4,
-//            1, 4, 3,
+        let index:[uint] = [
+//            2,0,1,
+//            2,1,3,
+            0, 3, 2,
+            0, 1, 3,
+            0, 2, 4,
+            0, 4, 1,
+            2, 3, 4,
+            1, 4, 3
         ]
         self.indexCount = index.count
-        vertexIndex = device.makeBuffer(bytes: index, length: MemoryLayout<Int32>.size * index.count, options: .storageModeShared)
+        vertexIndex = device.makeBuffer(bytes: index, length: MemoryLayout<uint>.size * index.count, options: .storageModeShared)
         
         
     }
@@ -164,14 +186,15 @@ class CubeRender: NSObject {
     
     var x:Float = 0.0
     var y:Float = 0.0
-    var z:Float = 0
+    var z:Float = 0.0
     
     
     
     func setMatrix(encode:MTLRenderCommandEncoder) {
         let size = self.view.bounds.size
-        let perspectM = GLKMatrix4MakePerspective(Float.pi / 2, Float(size.width/size.height), 0.1, 10)
-        var modelViewM = GLKMatrix4MakeTranslation(0, 0, -2)
+        let perspectM = GLKMatrix4MakePerspective(Float.pi/2, Float(size.width/size.height), 0.1, 50.0)
+        var modelViewM = GLKMatrix4Translate(GLKMatrix4Identity, 0, 0, -2)
+        
         if switchX.isOn {
             x += 1/180 * Float.pi
         }
@@ -187,16 +210,27 @@ class CubeRender: NSObject {
         modelViewM = GLKMatrix4RotateY(modelViewM, y)
         modelViewM = GLKMatrix4RotateZ(modelViewM, z)
         
-        let matrix = [perspectM,modelViewM]
+        var matrix = DqMatrix(pMatix: perspectM.toMatrix_float4x4(), mvMatrix: modelViewM.toMatrix_float4x4())
         
-        encode.setVertexBytes(matrix, length: MemoryLayout<GLKMatrix4>.size * 2, index: 1)
+        encode.setVertexBytes(&matrix, length: MemoryLayout<DqMatrix>.size, index: 1)
         
     }
     
 }
+struct DqMatrix {
+    var pMatix : matrix_float4x4
+    var mvMatrix :matrix_float4x4
+    
+}
 extension GLKMatrix4{
-    func toArray(){
-       
+    func toMatrix_float4x4() -> matrix_float4x4{
+        let matrix = self
+        return matrix_float4x4(
+            simd_make_float4(matrix.m00, matrix.m01, matrix.m02, matrix.m03),
+            simd_make_float4(matrix.m10, matrix.m11, matrix.m12, matrix.m13),
+            simd_make_float4(matrix.m20, matrix.m21, matrix.m22, matrix.m23),
+            simd_make_float4(matrix.m30, matrix.m31, matrix.m32, matrix.m33)
+        )
     }
 }
 extension CubeRender :MTKViewDelegate{
@@ -229,24 +263,25 @@ extension CubeRender :MTKViewDelegate{
         encoder.setViewport(MTLViewport(originX: 0, originY: 0, width: Double(viewSize.width), height: Double(viewSize.height), znear: -1, zfar: 1))
         
 //        encoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
-        var vertexs1:[Float] = [
-            1,-1,  0.0,  1,0,
-            -1,-1, 0.0,  0,0,
-            -1,1,  0.0,  0,1,
-            1,-1,  0.0,  0,1,
-            -1,1,  0.0,  1,0,
-            1,1,   0.0,  1,1
+        let vertexs1:[Float] = [
+          
+            -0.5, 0.5, 0, 1.0,0, 1,
+             0.5, 0.5, 0, 1.0,1, 1,
+            -0.5,-0.5, 0, 1.0,0, 0,
+             0.5,-0.5, 0, 1.0,1, 0,
+            0.0, 0.0, 0.5, 1,0.5,0.5
+            
         ]
         encoder.setVertexBytes(vertexs1, length: MemoryLayout<Float>.size * vertexs1.count, index: 0)
         self.setMatrix(encode: encoder)
         encoder.setFragmentTexture(texture, index: 0)
-        
-        encoder.setFrontFacing(MTLWinding.counterClockwise)
+//        encoder.setDepthStoreAction(.customSampleDepthStore)
+        encoder.setFrontFacing(.clockwise)
         encoder.setCullMode(MTLCullMode.back)
         
-        encoder.drawPrimitives(type: MTLPrimitiveType.triangleStrip, vertexStart: 0, vertexCount: 6)
+//        encoder.drawPrimitives(type: MTLPrimitiveType.triangleStrip, vertexStart: 0, vertexCount: 6)
         
-//        encoder.drawIndexedPrimitives(type: .triangleStrip, indexCount: self.indexCount, indexType: .uint32, indexBuffer: vertexIndex!, indexBufferOffset: 0)//使用索引绘图绘制
+        encoder.drawIndexedPrimitives(type: .triangleStrip, indexCount: self.indexCount, indexType: .uint32, indexBuffer: vertexIndex!, indexBufferOffset: 0)//使用索引绘图绘制
         
         encoder.endEncoding()
         
