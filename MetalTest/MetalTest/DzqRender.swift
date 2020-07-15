@@ -16,6 +16,7 @@ struct Color {
     var alpha :Double = 0
     
 }
+//创建顶点结构体
 struct VertexColor {
     var vex:vector_float2
     var color:vector_float4
@@ -29,7 +30,8 @@ class DzqRender: NSObject {
     var viewSize :CGSize = CGSize.zero
     init(view:MTKView) {
         self.view = view
-        self.device = view.device!
+        //1.拿到 GPU 对象，Metal 中提供了 MTLDevice 的接口，代表了 GPU。
+        self.device = MTLCreateSystemDefaultDevice()!
         self.commandQueue = device.makeCommandQueue()!
         super.init()
         view.preferredFramesPerSecond = 60

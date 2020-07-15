@@ -18,6 +18,7 @@ class ImageViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "metal加载图片"
         view.backgroundColor = .gray
         metalView = MTKView(frame: self.view.bounds)
         metalView.backgroundColor = .green

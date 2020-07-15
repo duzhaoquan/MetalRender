@@ -16,6 +16,7 @@ class CubeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "加载一个四面体"
         view.backgroundColor = .gray
         metalView = MTKView(frame: self.view.bounds)
         metalView.backgroundColor = .green

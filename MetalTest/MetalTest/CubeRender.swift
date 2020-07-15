@@ -4,14 +4,14 @@
 //
 //  Created by dzq_mac on 2020/7/2.
 //  Copyright © 2020 dzq_mac. All rights reserved.
-//
 
 import UIKit
 import MetalKit
 import GLKit
 struct CubeVertexTexture {
     var vex:vector_float4
-    var tex:vector_float2
+    var tex:vector_float4
+    var color:vector_float4
 }
 class CubeRender: NSObject {
     var view : MTKView
@@ -24,16 +24,15 @@ class CubeRender: NSObject {
     var vertexIndex:MTLBuffer?
     var texture:MTLTexture?
     var indexCount :Int = 0
-    
+    var button : UIButton!
     var switchX,switchY,switchZ :UISwitch
-    
-    
     
     init(view:MTKView) {
         self.view = view
         self.device = view.device!
         self.commandQueue = device.makeCommandQueue()!
-        switchX = UISwitch(frame: CGRect(x: 10 , y: view.frame.size.height - 100, width: 100, height: 60))
+        switchX = UISwitch(frame: CGRect(x: 20 , y: view.frame.size.height - 100, width: 100, height: 60))
+        
         switchY = UISwitch(frame: CGRect(x: 10 , y: view.frame.size.height - 100, width: 100, height: 60))
         switchY.center.x = view.center.x
         switchZ = UISwitch(frame: CGRect(x: view.frame.size.width - 110 , y: view.frame.size.height - 100, width: 100, height: 60))
@@ -47,6 +46,14 @@ class CubeRender: NSObject {
         switchX.backgroundColor = .gray
         switchY.backgroundColor = .gray
         switchZ.backgroundColor = .gray
+        
+        button = UIButton(frame: CGRect(x: 0, y: view.frame.size.height - 160, width: 100, height: 50))
+        button.setTitle("旋转", for: UIControl.State.normal)
+        button.center.x = view.center.x
+        button.backgroundColor = .gray
+        button.addTarget(self, action: #selector(rotate(btn:)), for: .touchUpInside)
+        view.addSubview(button)
+        
         setUpPipeLineState()
         
         setUpVertex()
@@ -54,7 +61,15 @@ class CubeRender: NSObject {
         setUpImageTexture()
         
     }
-    
+    @objc func rotate(btn:UIButton){
+        btn.isSelected = !btn.isSelected
+        if btn.isSelected {
+            btn.setTitle("停止", for: .normal)
+        }else {
+            btn.setTitle("旋转", for: .normal)
+        }
+        
+    }
     func setUpPipeLineState() {
         var library = try? device.makeDefaultLibrary()
         if let url = Bundle.main.url(forResource: "CubeRender", withExtension: "metal"){
@@ -80,65 +95,37 @@ class CubeRender: NSObject {
     }
     func setUpVertex() {
         
-//        let vertexs:[Float] = [
-//            1,-1,6,
-//            -1,-1,6,
-//            -1,1,6,
-//            1,1,6
-//
-////             0,   0,    0.3,  0.5,0.5,  0,1,1,1,
-//        ]
-        /*
-         -1,0
-         0,1
-         1,-1
-         
-         -1,1
-         0,1
-         1,-1
-         
-         -1,1
-         1,1
-         1,-1
-         
-         -1,1
-         1,1
-         1,-1
-         
-         0.0,1,
-         0.0,1,
-         0.0,1,
-         0.0,1,
-         
-         -0.3, 0, 1, 0,0,0,1,
-         -0.3, 1, 1, 0,1,1,0,
-         -0.3, 0, 0, 0,1,1,1,
-         -0.3, 1, 0, 1,1,0,1,
-         */
         let vertexs1:[Float] = [
           
-            -0.5, 0.5, 0, 1.0,0, 1,
-             0.5, 0.5, 0, 1.0,1, 1,
-            -0.5,-0.5, 0, 1.0,0, 0,
-             0.5,-0.5, 0, 1.0,1, 0,
-            0.0, 0.0, 0.5, 1,0.5,0.5
+            -0.5, 0.5, 0, 1.0,
+             0.5, 0.5, 0, 1.0,
+            -0.5,-0.5, 0, 1.0,
+             0.5,-0.5, 0, 1.0,
+             0.0, 0.0, 0.5, 1
             
         ]
-        var  vertexs2 : [CubeVertexTexture] = [
-            CubeVertexTexture(vex: vector_float4(-0.5, 0.5, 0, 1.0), tex: vector_float2(0, 1)),//左上
-            CubeVertexTexture(vex: vector_float4( 0.5, 0.5, 0, 1.0), tex: vector_float2(1, 1)),//右上
-            CubeVertexTexture(vex: vector_float4(-0.5,-0.5, 0, 1.0), tex: vector_float2(0, 0)),//左下
-            CubeVertexTexture(vex: vector_float4( 0.5,-0.5, 0, 1.0), tex: vector_float2(1, 0)),//右下
-            CubeVertexTexture(vex: vector_float4( 0.0, 0.0, 0.5, 1.0), tex: vector_float2(0.5, 0.5))
+        let vertexs3:[Float] = [
+
+           -0.5, 0.5, 0, 1.0,0, 1,
+            0.5, 0.5, 0, 1.0,1, 1,
+           -0.5,-0.5, 0, 1.0,0, 0,
+            0.5,-0.5, 0, 1.0,1, 0,
+            0.0, 0.0, 1, 1,0.5,0.5
+
         ]
         
-        var vert: UnsafeRawPointer = UnsafeRawPointer(vertexs1)
-        vertexBuffer = device.makeBuffer(bytes: vert, length: MemoryLayout<CubeVertexTexture>.size * (vertexs2.count), options: .storageModeShared)
+        let  vertexs2 : [CubeVertexTexture] = [
+            CubeVertexTexture(vex: vector_float4(-0.5, 0.5, 0, 1.0), tex: vector_float4(0, 1, 0, 0), color: vector_float4(1, 0,0,1)),//左上
+            CubeVertexTexture(vex: vector_float4( 0.5, 0.5, 0, 1.0), tex: vector_float4(1, 1, 0, 0), color: vector_float4(0, 1,0,1)),//右上
+            CubeVertexTexture(vex: vector_float4(-0.5,-0.5, 0, 1.0), tex: vector_float4(0, 0, 0, 0), color: vector_float4(0, 0,1,1)),//左下
+            CubeVertexTexture(vex: vector_float4( 0.5,-0.5, 0, 1.0), tex: vector_float4(1, 0, 0, 0), color: vector_float4(0, 1,1,1)),//右下
+            CubeVertexTexture(vex: vector_float4( 0.0, 0.0, 0.5, 1.0), tex: vector_float4(0.5,0.5,0,0), color: vector_float4(1, 1,0,1))
+        ]
+        //坑：顶点坐标值的个数必须是4的倍数，vertexs1可以，vertexs3不行，vertexs2可以
+        vertexBuffer = device.makeBuffer(bytes: vertexs2, length: MemoryLayout<CubeVertexTexture>.size * (vertexs2.count), options: .storageModeShared)
         
         //索引
         let index:[uint] = [
-//            2,0,1,
-//            2,1,3,
             0, 3, 2,
             0, 1, 3,
             0, 2, 4,
@@ -189,21 +176,22 @@ class CubeRender: NSObject {
     var z:Float = 0.0
     
     
-    
+    //设置矩阵变换
     func setMatrix(encode:MTLRenderCommandEncoder) {
         let size = self.view.bounds.size
         let perspectM = GLKMatrix4MakePerspective(Float.pi/2, Float(size.width/size.height), 0.1, 50.0)
         var modelViewM = GLKMatrix4Translate(GLKMatrix4Identity, 0, 0, -2)
-        
-        if switchX.isOn {
-            x += 1/180 * Float.pi
-        }
-        if switchY.isOn {
-            y += 1/180 * Float.pi
-        }
-        
-        if switchZ.isOn {
-            z += 1/180 * Float.pi
+        if button.isSelected {
+            if switchX.isOn {
+                x += 1/180 * Float.pi
+            }
+            if switchY.isOn {
+                y += 1/180 * Float.pi
+            }
+            
+            if switchZ.isOn {
+                z += 1/180 * Float.pi
+            }
         }
         
         modelViewM = GLKMatrix4RotateX(modelViewM, x)
@@ -250,6 +238,7 @@ extension CubeRender :MTKViewDelegate{
                 return
         }
         renderPassDiscriptor.colorAttachments[0].loadAction = .clear
+        renderPassDiscriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0.6, green: 0.2, blue: 0.5, alpha: 1)
         guard
             let encoder = buffer.makeRenderCommandEncoder(descriptor: renderPassDiscriptor)
             else {
@@ -262,28 +251,21 @@ extension CubeRender :MTKViewDelegate{
         
         encoder.setViewport(MTLViewport(originX: 0, originY: 0, width: Double(viewSize.width), height: Double(viewSize.height), znear: -1, zfar: 1))
         
-//        encoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
-        let vertexs1:[Float] = [
-          
-            -0.5, 0.5, 0, 1.0,0, 1,
-             0.5, 0.5, 0, 1.0,1, 1,
-            -0.5,-0.5, 0, 1.0,0, 0,
-             0.5,-0.5, 0, 1.0,1, 0,
-            0.0, 0.0, 0.5, 1,0.5,0.5
-            
-        ]
-        encoder.setVertexBytes(vertexs1, length: MemoryLayout<Float>.size * vertexs1.count, index: 0)
+        encoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
+       
+//        encoder.setVertexBytes(vertexs1, length: MemoryLayout<Float>.size * vertexs1.count, index: 0)
         self.setMatrix(encode: encoder)
         encoder.setFragmentTexture(texture, index: 0)
-//        encoder.setDepthStoreAction(.customSampleDepthStore)
-        encoder.setFrontFacing(.clockwise)
+
+        encoder.setFrontFacing(MTLWinding.counterClockwise)
         encoder.setCullMode(MTLCullMode.back)
         
-//        encoder.drawPrimitives(type: MTLPrimitiveType.triangleStrip, vertexStart: 0, vertexCount: 6)
+//        encoder.drawPrimitives(type: MTLPrimitiveType.triangleStrip, vertexStart: 0, vertexCount: 5)
         
-        encoder.drawIndexedPrimitives(type: .triangleStrip, indexCount: self.indexCount, indexType: .uint32, indexBuffer: vertexIndex!, indexBufferOffset: 0)//使用索引绘图绘制
+        encoder.drawIndexedPrimitives(type: .triangle, indexCount: self.indexCount, indexType: .uint32, indexBuffer: vertexIndex!, indexBufferOffset: 0)//使用索引绘图绘制
         
         encoder.endEncoding()
+        view
         
         buffer.present(view.currentDrawable!)
         

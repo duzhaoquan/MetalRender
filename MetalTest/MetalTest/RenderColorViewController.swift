@@ -15,6 +15,7 @@ class RenderColorViewController: UIViewController {
     var render : DzqRender?
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "metal渲染颜色"
         view.backgroundColor = .gray
         metalView = MTKView(frame: self.view.bounds)
         metalView.backgroundColor = .green
