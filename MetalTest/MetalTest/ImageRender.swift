@@ -21,7 +21,7 @@ class ImageRender: NSObject {
     var device :MTLDevice
     var pipelineState:MTLRenderPipelineState?
     var viewSize :CGSize = CGSize.zero
-    
+    var imageScale:(CGFloat,CGFloat) = (1,1)
     var vertexBuffer :MTLBuffer?
     var vertexIndex:MTLBuffer?
     var texture:MTLTexture?
@@ -41,7 +41,39 @@ class ImageRender: NSObject {
         setUpImageTexture(loadTga:loadTga)
         
     }
+    func imagefrom(destinationTexture:MTLTexture) -> UIImage?{
+      var pixelBuffer : CVPixelBuffer?
 
+        let cvret :CVReturn = CVPixelBufferCreate(kCFAllocatorDefault, destinationTexture.width, destinationTexture.height, kCVPixelFormatType_32BGRA, nil, &pixelBuffer)
+        
+        if cvret == kCVReturnSuccess, let pixelBuffer = pixelBuffer {
+            CVPixelBufferLockBaseAddress(pixelBuffer, CVPixelBufferLockFlags.init(rawValue: 0))
+            let region = MTLRegionMake2D(0, 0, Int(destinationTexture.width), Int(destinationTexture.height))
+            let bytesPerPixel = 4;
+            let bytesPerRow = CGFloat(bytesPerPixel) * CGFloat(destinationTexture.width)
+            
+            let tempBuffer = CVPixelBufferGetBaseAddress(pixelBuffer)
+            destinationTexture.getBytes(tempBuffer!, bytesPerRow: Int(bytesPerRow), from: region, mipmapLevel: 0)
+            
+            let image = self.imageFromCVPixelBuffer(buffer: pixelBuffer)
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags.init(rawValue: 0))
+            
+            return image
+            
+        }
+        return nil
+    }
+    func imageFromCVPixelBuffer(buffer: CVPixelBuffer) -> UIImage {
+        
+        let ciimage = CIImage(cvPixelBuffer: buffer)
+        let context = CIContext(options: nil)
+        let cgimgage = context.createCGImage(ciimage, from: CGRect(x: 0, y: 0, width: CVPixelBufferGetWidth(buffer), height: CVPixelBufferGetHeight(buffer)))
+
+        let uiimage = UIImage(cgImage: cgimgage!)
+
+        return uiimage
+    }
+    
     func setUpPipeLineState() {
         var library = try? device.makeDefaultLibrary()
         if let url = Bundle.main.url(forResource: "TextureRender", withExtension: "metal"){
@@ -85,7 +117,7 @@ class ImageRender: NSObject {
                 -1,1,  0,1,
                 1,1,   1,1
             ]
-            var imageScale:(CGFloat,CGFloat) = (1,1)
+            
             if let image = UIImage(named: imageName)?.cgImage {
                 let width = image.width
                 let height = image.height
@@ -205,6 +237,7 @@ extension ImageRender:MTKViewDelegate{
         buffer.present(view.currentDrawable!)
         
         buffer.commit()
+        
         
     }
     

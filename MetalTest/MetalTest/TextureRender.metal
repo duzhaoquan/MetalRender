@@ -40,6 +40,6 @@ vertex RasterizerData vertexShader1(uint vertexid [[vertex_id]],constant VertexI
 fragment float4 fragmentShader1(RasterizerData in [[stage_in]],texture2d<float> texture [[texture(0)]]){
     
     constexpr sampler textureSampler234(mag_filter::linear,min_filter::linear);
-    float4 color = texture.sample(textureSampler234, in.color);
+    float4 color = texture.sample(textureSampler234, in.color) * 0.7 + float4(1,0,0,1) * 0.3;
     return color;
 }

@@ -265,11 +265,11 @@ extension CubeRender :MTKViewDelegate{
         encoder.drawIndexedPrimitives(type: .triangle, indexCount: self.indexCount, indexType: .uint32, indexBuffer: vertexIndex!, indexBufferOffset: 0)//使用索引绘图绘制
         
         encoder.endEncoding()
-        view
         
         buffer.present(view.currentDrawable!)
         
         buffer.commit()
         
+        view.currentDrawable?.layer
     }
 }
